@@ -1,0 +1,33 @@
+# Smithery configuration file: https://smithery.ai/docs/config#smitheryyaml
+
+startCommand:
+  type: stdio
+  configSchema:
+    # JSON Schema defining the configuration options for the MCP.
+    type: object
+    required:
+      - emailAddress
+      - emailPassword
+      - imapServer
+      - smtpServer
+      - smtpPort
+    properties:
+      emailAddress:
+        type: string
+        description: The email address used to connect to the email server.
+      emailPassword:
+        type: string
+        description: The app-specific password for the email account.
+      imapServer:
+        type: string
+        description: The IMAP server address.
+      smtpServer:
+        type: string
+        description: The SMTP server address.
+      smtpPort:
+        type: number
+        description: The SMTP server port.
+  commandFunction:
+    # A function that produces the CLI command to start the MCP on stdio.
+    |-
+    (config) => ({ command: 'email-client', env: { EMAIL_ADDRESS: config.emailAddress, EMAIL_PASSWORD: config.emailPassword, IMAP_SERVER: config.imapServer, SMTP_SERVER: config.smtpServer, SMTP_PORT: config.smtpPort.toString() } })

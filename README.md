@@ -1,5 +1,7 @@
 # ClaudePost
 
+[![smithery badge](https://smithery.ai/badge/@ZilongXue/claude-post)](https://smithery.ai/server/@ZilongXue/claude-post)
+
 A Model Context Protocol (MCP) server that provides a seamless email management interface through Claude. This integration allows you to handle emails directly through natural language conversations with Claude, supporting features like searching, reading, and sending emails securely.
 
 ## Features & Demo
@@ -33,6 +35,16 @@ A Model Context Protocol (MCP) server that provides a seamless email management 
 - Claude Desktop application
 
 ## Setup
+
+### Installing via Smithery
+
+To install Email Management Interface for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@ZilongXue/claude-post):
+
+```bash
+npx -y @smithery/cli install @ZilongXue/claude-post --client claude
+```
+
+### Manual Installation
 
 1. Install uv:
 
