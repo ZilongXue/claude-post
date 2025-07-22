@@ -2,6 +2,10 @@
 
 A Model Context Protocol (MCP) server that provides a seamless email management interface through Claude. This integration allows you to handle emails directly through natural language conversations with Claude, supporting features like searching, reading, and sending emails securely.
 
+<a href="https://glama.ai/mcp/servers/@ZilongXue/claude-post">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@ZilongXue/claude-post/badge" alt="ClaudePost MCP server" />
+</a>
+
 ## Features & Demo
 
 ### Email Search and Reading
