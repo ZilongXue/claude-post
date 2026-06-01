@@ -7,6 +7,7 @@ import smtplib
 import logging
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.header import decode_header, make_header
 import os
 from dotenv import load_dotenv
 from mcp.server.models import InitializationOptions
@@ -39,42 +40,67 @@ MAX_EMAILS = 100
 
 server = Server("email")
 
+def _decode_header_value(value: str | None, default: str = "Unknown") -> str:
+    """Decode an RFC 2047 encoded header (e.g. '=?UTF-8?B?...?=') into readable text."""
+    if not value:
+        return default
+    try:
+        return str(make_header(decode_header(value)))
+    except Exception:
+        return value
+
+def _decode_payload(part) -> str:
+    """Decode a message part's payload using its declared charset, with a safe fallback.
+
+    Falls back to UTF-8 with replacement so emails in other encodings (or with a
+    missing/mislabeled charset) stay readable instead of raising UnicodeDecodeError.
+    """
+    payload = part.get_payload(decode=True)
+    if payload is None:
+        return ""
+    charset = part.get_content_charset() or "utf-8"
+    try:
+        return payload.decode(charset, errors="replace")
+    except (LookupError, TypeError):
+        # Unknown charset name — fall back to UTF-8 with replacement
+        return payload.decode("utf-8", errors="replace")
+
 def format_email_summary(msg_data: tuple) -> dict:
     """Format an email message into a summary dict with basic information."""
     email_body = email.message_from_bytes(msg_data[0][1])
-    
+
     return {
         "id": msg_data[0][0].split()[0].decode(),  # Get the email ID
-        "from": email_body.get("From", "Unknown"),
+        "from": _decode_header_value(email_body.get("From")),
         "date": email_body.get("Date", "Unknown"),
-        "subject": email_body.get("Subject", "No Subject"),
+        "subject": _decode_header_value(email_body.get("Subject"), "No Subject"),
     }
 
 def format_email_content(msg_data: tuple) -> dict:
     """Format an email message into a dict with full content."""
     email_body = email.message_from_bytes(msg_data[0][1])
-    
+
     # Extract body content
     body = ""
     if email_body.is_multipart():
         # Handle multipart messages
         for part in email_body.walk():
             if part.get_content_type() == "text/plain":
-                body = part.get_payload(decode=True).decode()
+                body = _decode_payload(part)
                 break
             elif part.get_content_type() == "text/html":
                 # If no plain text found, use HTML content
                 if not body:
-                    body = part.get_payload(decode=True).decode()
+                    body = _decode_payload(part)
     else:
         # Handle non-multipart messages
-        body = email_body.get_payload(decode=True).decode()
-    
+        body = _decode_payload(email_body)
+
     return {
-        "from": email_body.get("From", "Unknown"),
-        "to": email_body.get("To", "Unknown"),
+        "from": _decode_header_value(email_body.get("From")),
+        "to": _decode_header_value(email_body.get("To")),
         "date": email_body.get("Date", "Unknown"),
-        "subject": email_body.get("Subject", "No Subject"),
+        "subject": _decode_header_value(email_body.get("Subject"), "No Subject"),
         "content": body
     }
 
