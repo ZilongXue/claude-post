@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/zilongxue-claude-post-badge.png)](https://mseep.ai/app/zilongxue-claude-post)
+
 # ClaudePost
 
 A Model Context Protocol (MCP) server that provides a seamless email management interface through Claude. This integration allows you to handle emails directly through natural language conversations with Claude, supporting features like searching, reading, and sending emails securely.
